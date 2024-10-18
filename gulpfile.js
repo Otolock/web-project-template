@@ -9,6 +9,7 @@ const terser = require('gulp-terser');
 const concat = require('gulp-concat');
 const browserSync = require('browser-sync').create();
 const sourcemaps = require('gulp-sourcemaps');
+const fs = require('fs');
 
 // File paths
 const files = {
@@ -17,34 +18,67 @@ const files = {
     js: 'src/js/**/*.js'
 };
 
+// Define languages and pages
+const languages = ['en', 'es'];
+const pages = [
+    { template: 'services.njk', filenames: { en: 'services.html', es: 'servicios.html' } },
+    { template: 'index.njk', filenames: { en: 'index.html', es: 'inicio.html' } }
+];
+
+// Clean task: Delete the /dist folder if it exists
+async function clean() {
+    const { deleteAsync } = await import('del');  // Use the correct named export from 'del'
+    return deleteAsync('dist');  // Delete the 'dist' folder using the `deleteAsync` method
+}
+
+
 // Tailwind CSS task (with sourcemaps for dev, without for build)
 function cssTask(devMode) {
     return src(files.css)
-        .pipe(devMode ? sourcemaps.init() : noop())  // noop() is a Gulp utility that does nothing if in production mode
+        .pipe(devMode ? sourcemaps.init() : noop())
         .pipe(postcss([tailwindcss, autoprefixer, ...(devMode ? [] : [cssnano])]))
-        .pipe(devMode ? sourcemaps.write('.') : noop())  // write sourcemaps only in dev mode
+        .pipe(devMode ? sourcemaps.write('.') : noop())
         .pipe(dest('dist/css'))
         .pipe(browserSync.stream());
 }
 
 // Nunjucks HTML task (minify only in production)
 function htmlTask(devMode) {
-    return src(files.html)
-        .pipe(nunjucksRender({
-            path: ['src/templates/'] // Where the templates are located
-        }))
-        .pipe(devMode ? noop() : htmlmin({ collapseWhitespace: true }))  // minify HTML only in production mode
-        .pipe(dest('dist'))
-        .pipe(browserSync.stream());
+    const tasks = languages.map((lang) => {
+        return pages.map((page) => {
+            const commonTranslations = JSON.parse(fs.readFileSync(`src/lang/${lang}/common.json`, 'utf8'));
+            const pageTranslationsFilePath = `src/lang/${lang}/${page.filenames[lang].split('.')[0]}.json`;
+
+            if (fs.existsSync(pageTranslationsFilePath)) {
+                const pageTranslations = JSON.parse(fs.readFileSync(pageTranslationsFilePath, 'utf8'));
+
+                // Merge common and page-specific translations
+                const translations = Object.assign({}, commonTranslations, pageTranslations);
+
+                return src(`src/templates/pages/${page.template}`)
+                    .pipe(nunjucksRender({
+                        path: ['src/templates/'],
+                        data: { translations }
+                    }))
+                    .pipe(devMode ? noop() : htmlmin({ collapseWhitespace: true }))
+                    .pipe(dest(`dist/${lang}`))
+                    .pipe(browserSync.stream());
+            } else {
+                console.error(`Translation file not found: ${pageTranslationsFilePath}`);
+            }
+        });
+    });
+
+    return Promise.all(tasks.flat());
 }
 
 // JavaScript task (with sourcemaps for dev, minify for production)
 function jsTask(devMode) {
     return src(files.js)
-        .pipe(devMode ? sourcemaps.init() : noop())  // init sourcemaps only in dev mode
+        .pipe(devMode ? sourcemaps.init() : noop())
         .pipe(concat('main.js'))
-        .pipe(devMode ? noop() : terser())  // minify JS only in production
-        .pipe(devMode ? sourcemaps.write('.') : noop())  // write sourcemaps only in dev mode
+        .pipe(devMode ? noop() : terser())
+        .pipe(devMode ? sourcemaps.write('.') : noop())
         .pipe(dest('dist/js'))
         .pipe(browserSync.stream());
 }
@@ -61,26 +95,30 @@ function watchTask() {
     watch([files.js], () => jsTask(true));
 }
 
+// Development task (with async completion signal)
+function dev(done) {
+    series(
+        clean, // Clean dist folder before dev
+        parallel(() => htmlTask(true), () => cssTask(true), () => jsTask(true)),
+        watchTask
+    )();
+    done(); // Signal async completion
+}
+
+// Build task for production
+function build(done) {
+    series(
+        clean,  // Add clean task before the build
+        parallel(() => htmlTask(false), () => cssTask(false), () => jsTask(false))
+    )();
+    done(); // Signal async completion
+}
+
 // No-op function for production (to skip sourcemaps and unnecessary steps)
 function noop() {
     return require('through2').obj();
 }
 
-// Development task
-function dev(done) {
-    return series(
-        parallel(() => htmlTask(true), () => cssTask(true), () => jsTask(true)),
-        watchTask
-    )(done);  // Signal async completion
-}
-
-// Build task for production
-function build(done) {
-    return series(
-        parallel(() => htmlTask(false), () => cssTask(false), () => jsTask(false))
-    )(done);  // Signal async completion
-}
-
-
 exports.dev = dev;
 exports.build = build;
+exports.clean = clean;

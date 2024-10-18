@@ -1,0 +1,13 @@
+{
+    "lang": "en",
+    "site_title": "Webify Pro",
+    "nav": {
+        "home": "Home",
+        "services": "Services",
+        "contact": "Contact",
+        "home_url": "index.html",
+        "services_url": "services.html",
+        "contact_url": "contact.html"
+    },
+    "footer_text": "© 2024 Webify Pro. All rights reserved."
+}

@@ -1,6 +1,18 @@
 {% extends "layouts/main.njk" %}
 
 {% block content %}
-<h1>Welcome to Webify Pro</h1>
-<p>This is your landing page!</p>
+    <section class="hero">
+        <h1>{{ translations.page_title }}</h1>
+        <p>{{ translations.intro_text }}</p>
+        <button class="cta-button">{{ translations.cta_button }}</button>
+    </section>
+
+    <section class="features">
+        <h2>{{ translations.feature_heading }}</h2>
+        <ul>
+            <li>{{ translations.feature_1 }}</li>
+            <li>{{ translations.feature_2 }}</li>
+            <li>{{ translations.feature_3 }}</li>
+        </ul>
+    </section>
 {% endblock %}
