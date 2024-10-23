@@ -9,20 +9,23 @@ const terser = require('gulp-terser');
 const concat = require('gulp-concat');
 const browserSync = require('browser-sync').create();
 const sourcemaps = require('gulp-sourcemaps');
+const rename = require('gulp-rename');
 const fs = require('fs');
 
 // File paths
 const files = {
-    html: 'src/templates/pages/**/*.njk',
+    html: 'src/templates/**/*.njk',
     css: 'src/css/**/*.css',
-    js: 'src/js/**/*.js'
+    js: 'src/js/**/*.js',
+    lang: 'src/lang/**/*.json'
 };
 
-// Define languages and pages
-const languages = ['en', 'es'];
+// Define languages and default language
+const defaultLanguage = 'en';  // Set your default language here
+const languages = ['en', 'es'];  // Define available languages
 const pages = [
     { template: 'services.njk', filenames: { en: 'services.html', es: 'servicios.html' } },
-    { template: 'index.njk', filenames: { en: 'index.html', es: 'inicio.html' } }
+    { template: 'index.njk', filenames: { en: 'index.html', es: 'index.html' } }
 ];
 
 // Clean task: Delete the /dist folder if it exists
@@ -30,7 +33,6 @@ async function clean() {
     const { deleteAsync } = await import('del');  // Use the correct named export from 'del'
     return deleteAsync('dist');  // Delete the 'dist' folder using the `deleteAsync` method
 }
-
 
 // Tailwind CSS task (with sourcemaps for dev, without for build)
 function cssTask(devMode) {
@@ -55,13 +57,18 @@ function htmlTask(devMode) {
                 // Merge common and page-specific translations
                 const translations = Object.assign({}, commonTranslations, pageTranslations);
 
+                // Determine the output directory based on whether this is the default language
+                const outputDir = lang === defaultLanguage ? 'dist' : `dist/${lang}`;
+                const outputFileName = page.filenames[lang];  // Get the filename for this language
+
                 return src(`src/templates/pages/${page.template}`)
                     .pipe(nunjucksRender({
                         path: ['src/templates/'],
                         data: { translations }
                     }))
                     .pipe(devMode ? noop() : htmlmin({ collapseWhitespace: true }))
-                    .pipe(dest(`dist/${lang}`))
+                    .pipe(rename(outputFileName))  // Rename the file based on the filenames defined
+                    .pipe(dest(outputDir))  // Output to root for default language or /[language]/ for alternates
                     .pipe(browserSync.stream());
             } else {
                 console.error(`Translation file not found: ${pageTranslationsFilePath}`);
@@ -90,10 +97,20 @@ function watchTask() {
             baseDir: 'dist'
         }
     });
-    watch([files.html], () => htmlTask(true));
-    watch([files.css], () => cssTask(true));
-    watch([files.js], () => jsTask(true));
+
+    // Watch Nunjucks templates and rebuild both HTML and CSS when a change occurs
+    watch('src/templates/**/*.njk', series(() => htmlTask(true), () => cssTask(true)));
+
+    // Watch for changes in language JSON files (this only needs to trigger the HTML task)
+    watch('src/lang/**/*.json', () => htmlTask(true));
+
+    // Watch for changes in CSS files
+    watch('src/css/**/*.css', () => cssTask(true));
+
+    // Watch for changes in JavaScript files
+    watch('src/js/**/*.js', () => jsTask(true));
 }
+
 
 // Development task (with async completion signal)
 function dev(done) {
