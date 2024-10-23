@@ -1,18 +1,25 @@
 {% extends "layouts/main.njk" %}
-
 {% block content %}
-    <section class="hero">
-        <h1>{{ translations.page_title }}</h1>
-        <p>{{ translations.intro_text }}</p>
-        <button class="cta-button">{{ translations.cta_button }}</button>
-    </section>
+<section class="text-center py-16">
+  <h1 class="text-4xl font-bold mb-4">{{ translations.welcome_message }}</h1>
+  <p class="text-lg text-gray-600 mb-8">{{ translations.intro_text }}</p>
+  <a href="/{{ translations.nav.services_url }}" class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600">
+    {{ translations.call_to_action }}
+  </a>
+</section>
 
-    <section class="features">
-        <h2>{{ translations.feature_heading }}</h2>
-        <ul>
-            <li>{{ translations.feature_1 }}</li>
-            <li>{{ translations.feature_2 }}</li>
-            <li>{{ translations.feature_3 }}</li>
-        </ul>
-    </section>
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto py-16">
+  <div class="p-6 bg-gray-100 rounded-lg">
+    <h2 class="text-2xl font-semibold mb-2">{{ translations.feature_1_title }}</h2>
+    <p>{{ translations.feature_1_description }}</p>
+  </div>
+  <div class="p-6 bg-gray-100 rounded-lg">
+    <h2 class="text-2xl font-semibold mb-2">{{ translations.feature_2_title }}</h2>
+    <p>{{ translations.feature_2_description }}</p>
+  </div>
+  <div class="p-6 bg-gray-100 rounded-lg">
+    <h2 class="text-2xl font-semibold mb-2">{{ translations.feature_3_title }}</h2>
+    <p>{{ translations.feature_3_description }}</p>
+  </div>
+</section>
 {% endblock %}

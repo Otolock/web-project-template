@@ -1,37 +1,45 @@
 <!DOCTYPE html>
 <html lang="{{ translations.lang }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ translations.site_title }}</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/{{ translations.nav.home_url }}">{{ translations.nav.home }}</a></li>
-                <li><a href="/{{ translations.nav.services_url }}">{{ translations.nav.services }}</a></li>
-                <li><a href="/{{ translations.nav.contact_url }}">{{ translations.nav.contact }}</a></li>
-                
-                <!-- Language Switcher -->
-                <li>
-                    <div class="language-switcher">
-                        <a href="/en/{{ translations.nav.home_url }}" class="{% if translations.lang == 'en' %}active{% endif %}">English</a> | 
-                        <a href="/es/{{ translations.nav.home_url }}" class="{% if translations.lang == 'es' %}active{% endif %}">Español</a>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer>
-        <p>{{ translations.footer_text }}</p>
-    </footer>
-    <script src="/js/main.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ translations.site_title }}</title>
+        <link rel="stylesheet" href="/css/styles.css">
+    </head>
+    <body>
+        <header class="bg-blue-600 p-4">
+            <nav>
+                <ul class="flex flex-col sm:flex-row sm:gap-6 items-center text-white">
+                    <li class="mb-2 sm:mb-0">
+                        <a href="/{{ translations.nav.home_url }}" class="hover:text-gray-200 text-lg">{{ translations.nav.home }}</a>
+                    </li>
+                    <li class="mb-2 sm:mb-0">
+                        <a href="/{{ translations.nav.services_url }}" class="hover:text-gray-200 text-lg">{{ translations.nav.services }}</a>
+                    </li>
+                    <li class="mb-2 sm:mb-0">
+                        <a href="/{{ translations.nav.contact_url }}" class="hover:text-gray-200 text-lg">{{ translations.nav.contact }}</a>
+                    </li>
+                    <!-- Language Switcher -->
+                    <li>
+                        <div class="language-switcher flex items-center">
+                            <a
+                                id="english-link"
+                                class="hover:text-gray-200 text-lg {% if translations.lang == 'en' %}underline{% endif %}">English</a>
+                            <span class="mx-2">|</span>
+                            <a
+                                id="spanish-link"
+                                class="hover:text-gray-200 text-lg {% if translations.lang == 'es' %}underline{% endif %}">Español</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p>{{ translations.footer_text }}</p>
+        </footer>
+        <script src="/js/main.js"></script>
+    </body>
 </html>

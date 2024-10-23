@@ -1,9 +1,12 @@
 {
-    "page_title": "Welcome to Webify Pro",
-    "intro_text": "We offer custom web development services.",
-    "cta_button": "Learn More",
-    "feature_heading": "Our Key Features",
-    "feature_1": "Custom Website Design",
-    "feature_2": "Responsive and Mobile Friendly",
-    "feature_3": "24/7 Support"
-}
+    "welcome_message": "Welcome to Our Website",
+    "intro_text": "We offer a wide range of services to meet your needs.",
+    "call_to_action": "Explore Our Services",
+    "feature_1_title": "High-Quality Service",
+    "feature_1_description": "We provide top-notch services tailored to your business.",
+    "feature_2_title": "Reliable Support",
+    "feature_2_description": "Our support team is here to help you 24/7.",
+    "feature_3_title": "Affordable Prices",
+    "feature_3_description": "Get the best value with competitive pricing."
+  }
+  

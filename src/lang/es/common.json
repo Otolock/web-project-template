@@ -1,13 +1,13 @@
 {
-    "lang": "es",
-    "site_title": "Webify Pro",
-    "nav": {
-        "home": "Inicio",
-        "services": "Servicios",
-        "contact": "Contacto",
-        "home_url": "index.html",
-        "services_url": "servicios.html",
-        "contact_url": "contacto.html"
-    },
-    "footer_text": "© 2024 Webify Pro. Todos los derechos reservados."
+  "lang": "es",
+  "site_title": "Bienvenido a Nuestro Sitio Web",
+  "footer_text": "© 2024 Todos los Derechos Reservados.",
+  "nav": {
+    "home_url": "es",
+    "services_url": "es/servicios",
+    "contact_url": "es/contacto",
+    "home": "Inicio",
+    "services": "Servicios",
+    "contact": "Contacto"
+  }
 }
